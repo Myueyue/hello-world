@@ -1,17 +1,11 @@
-## Set the base image to CentOS  基于centos镜像
-FROM centos
-# File Author / Maintainer  作者信息
-MAINTAINER test test@example.com
-# Install necessary tools  安装一些依赖的包
-RUN yum install -y pcre-devel wget net-tools gcc zlib zlib-devel make openssl-devel
-# Install Nginx  安装nginx
-ADD http://nginx.org/download/nginx-1.8.0.tar.gz .  # 添加nginx的压缩包到当前目录下
-RUN tar zxvf nginx-1.8.0.tar.gz  # 解包
-RUN mkdir -p /usr/local/nginx  # 创建nginx目录
-RUN cd nginx-1.8.0 && ./configure --prefix=/usr/local/nginx && make && make install  # 编译安装
-RUN rm -fv /usr/local/nginx/conf/nginx.conf  # 删除自带的nginx配置文件
-ADD http://www.apelearn.com/study_v2/.nginx_conf /usr/local/nginx/conf/nginx.conf  # 添加nginx配置文件
-# Expose ports  开放80端口出来
-EXPOSE 80
-# Set the default command to execute when creating a new container  这里是因为防止服务启动后容器会停止的情况，所以需要多执行一句tail命令
-ENTRYPOINT /usr/local/nginx/sbin/nginx && tail -f /etc/passwd
+  # 注意：非注释第一行 必须以FROM 开头。
+  # FROM 指定基础镜像，即以此镜像作为基础
+  FROM nginx
+  # 设置元数据，利用 docker inspect [镜像名称|镜像ID],即可查看。
+
+  # 操作执行，这里直接修改了nginx的html的首页内容，/usr/share/nginx/html
+ # 原本想输出中文，乱码了，设置了 ENV LANG C.UTF-8 或者 ENV LANG zh_CN.UTF-8 都不行 放弃了，有知道大神望告知！
+  RUN echo 'hello,oKong' > /usr/share/nginx/html/index.html
+  # 启动命令 不写时 会直接使用基础镜像的启动命令
+  CMD ["nginx", "-g", "daemon off;"]
+  
